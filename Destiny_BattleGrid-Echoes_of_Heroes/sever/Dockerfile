@@ -1,0 +1,1 @@
+FROM haskell:9.4.8 AS build
