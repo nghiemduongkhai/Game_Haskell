@@ -1,1 +1,0 @@
--- Game: Destiny BattleGrid: Echoes of Heroes / Vận bàn chiến: Tiếng Vọng Anh Hùng
