@@ -1,0 +1,68 @@
+name: server
+version: 0.1.0.0
+github: "nghiemduongkhai/Haskell-Game"
+license: MIT
+author: "nghiemduongkhai"
+extra-source-files:
+  - static/index.html
+
+# ========= Library =========
+library:
+  source-dirs: src
+  exposed-modules:
+    - Game.Types
+    - Game.State
+    - Game.Logic
+    - Game.Update
+    - Network.WebSocket
+    - Network.API
+    - Utils.Config
+    - Utils.Logging
+  dependencies:
+    - base >= 4.7 && < 5
+    - aeson
+    - bytestring
+    - text
+    - containers
+    - websockets
+    - async
+    - parallel
+    - time
+    - directory
+    - filepath
+    - fsnotify
+    - mtl
+    - unordered-containers
+    - stm
+    - wai
+    - warp
+    - wai-extra
+    - wai-cors
+    - wai-app-static
+
+# ========= Executable =========
+executables:
+  server-exe:
+    main: Main.hs
+    source-dirs: app
+    ghc-options:
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
+    dependencies:
+      - base
+      - server        
+    language: Haskell2010
+    other-modules: []
+
+# ========= Tests =========
+tests:
+  server-test:
+    main: Spec.hs
+    source-dirs: tests
+    dependencies:
+      - base
+      - server
+      - hspec
+    language: Haskell2010
+    other-modules: []
