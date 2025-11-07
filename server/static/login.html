@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Pong Login</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
+</head>
+<body class="login">
+  <h1>N&K Pong Game</h1>
+  <input type="text" id="username" placeholder="Enter your name..." />
+  <button id="playBtn">Login</button>
+
+  <script>
+    document.getElementById("playBtn").onclick = () => {
+      const name = document.getElementById("username").value.trim();
+      if (name) {
+        localStorage.setItem("playerName", name);
+        window.location.href = "index.html";
+      } 
+      else {
+        alert("Please enter your name!");
+      }
+    };
+  </script>
+</body>
+</html>
