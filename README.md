@@ -1,6 +1,6 @@
 # PONG Game ⚡
 
-📁 Project Structure
+### 📁 Project Structure
 ```
 PONG Game
 ├── server/
@@ -28,4 +28,5 @@ PONG Game
 ├── cabal.project
 └── README.md
 ```
+
 
