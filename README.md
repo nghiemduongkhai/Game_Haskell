@@ -19,6 +19,8 @@ PONG Game
 │   │       └── Logging.hs
 │   ├── static/
 │   │   ├── index.html
+|   |   ├── lobby.html
+|   |   ├── login.html
 │   │   ├── main.js
 │   │   └── style.css
 │   ├── package.yaml
@@ -28,5 +30,6 @@ PONG Game
 ├── cabal.project
 └── README.md
 ```
+
 
 
