@@ -1,23 +1,32 @@
+# PONG Game ⚡
+
+## A real-time game server built in Haskell, using WebSocket communication and a modular architecture. Project includes complete server logic, networking layer, utilities, and static frontend.
+
+📁 Project Structure
+```
+PONG Game
 ├── server/
-|   ├── app/
-|   │   └── Main.hs
-|   ├── src/
-|   │   ├── Game/
-|   │   │   ├── Types.hs
-|   │   │   ├── Logic.hs
-|   │   │   └── State.hs
-|   │   ├── Network/
-|   │   │   ├── WebSocket.hs
-|   │   │   └── API.hs
-|   │   └── Utils/
-|   │       ├── Config.hs
-|   │       └── Logging.hs
-|   ├── static/
-|   │   ├── index.html
-|   │   ├── main.js
-|   │   └── style.css
-|   ├── package.yaml
-|   └── stack.yaml
+│   ├── app/
+│   │   └── Main.hs
+│   ├── src/
+│   │   ├── Game/
+│   │   │   ├── Types.hs
+│   │   │   ├── Logic.hs
+│   │   │   └── State.hs
+│   │   ├── Network/
+│   │   │   ├── WebSocket.hs
+│   │   │   └── API.hs
+│   │   └── Utils/
+│   │       ├── Config.hs
+│   │       └── Logging.hs
+│   ├── static/
+│   │   ├── index.html
+│   │   ├── main.js
+│   │   └── style.css
+│   ├── package.yaml
+│   │   
+│   └── stack.yaml
 ├── .env
 ├── cabal.project
 └── README.md
+```
