@@ -79,7 +79,6 @@ canvas.addEventListener("touchmove", e => {
   } else {
     rightPaddle.y = Math.max(0, Math.min(y - paddleHeight / 2, canvas.height - paddleHeight));
   }
-
   e.preventDefault(); // tránh cuộn trang
 });
 
@@ -102,7 +101,7 @@ function draw() {
   ctx.strokeStyle = "#ffffff";
   ctx.lineWidth = 2;
   ctx.beginPath();
-  ctx.arc(320 + Math.sin(t) * 100, 240, 10, 0, Math.PI * 2);
+  ctx.arc(320 + Math.sin(t) * 350, 240, 10, 0, Math.PI * 2);
   ctx.fill();
   ctx.stroke();
 
@@ -120,7 +119,7 @@ function draw() {
   if (keys["ArrowUp"] && rightPaddle.y > 0) rightPaddle.y -= paddleSpeed;
   if (keys["ArrowDown"] && rightPaddle.y + paddleHeight < canvas.height) rightPaddle.y += paddleSpeed;
 
-  t += 0.05;
+  t += 0.025;
   requestAnimationFrame(draw);
 }
 
