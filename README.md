@@ -1,7 +1,5 @@
 # PONG Game ⚡
 
-## A real-time game server built in Haskell, using WebSocket communication and a modular architecture. Project includes complete server logic, networking layer, utilities, and static frontend.
-
 📁 Project Structure
 ```
 PONG Game
@@ -30,3 +28,4 @@ PONG Game
 ├── cabal.project
 └── README.md
 ```
+
