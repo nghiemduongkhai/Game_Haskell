@@ -19,17 +19,16 @@ PONG Game
 │   │       └── Logging.hs
 │   ├── static/
 │   │   ├── index.html
-|   |   ├── lobby.html
 |   |   ├── login.html
 │   │   ├── main.js
 │   │   └── style.css
-│   ├── package.yaml
-│   │   
+│   ├── package.yaml   
 │   └── stack.yaml
 ├── .env
 ├── cabal.project
 └── README.md
 ```
+
 
 
 
