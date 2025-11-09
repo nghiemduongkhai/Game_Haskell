@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Pong Login</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
+  <style>
+    #errorMsg {
+      color: rgb(255, 225, 0);
+      margin-top: 5px;
+      font-size: 0.9em;
+      min-height: 1.1em; /* giữ khoảng trống khi không có lỗi */
+    }
+  </style>
+</head>
+<body class="login">
+  <h1>N&K Pong Game</h1>
+  <input type="text" id="username" placeholder="Enter your name..." />
+  <div id="errorMsg"></div>
+  <button id="playBtn">Login</button>
+
+  <script>
+    document.getElementById("playBtn").onclick = () => {
+      const input = document.getElementById("username");
+      const name = input.value.trim();
+      const errorMsg = document.getElementById("errorMsg");
+
+      // Reset thông báo
+      errorMsg.textContent = "";
+
+      if (!name) {
+        errorMsg.textContent = "Please enter your name!";
+      } 
+      else if (!/^[a-zA-Z0-9]+$/.test(name)) {
+        errorMsg.textContent = "Name can only contain letters and numbers!";
+      }
+      else {
+        localStorage.setItem("playerName", name);
+        window.location.href = "lobby.html";
+      }
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Pong Lobby</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
+  <style>
+    #errorMsg {
+      color: rgb(255, 225, 0);
+      margin-top: 5px;
+      font-size: 0.9em;
+      min-height: 1.1em; /* giữ khoảng trống khi không có lỗi */
+      text-align: center;
+    }
+  </style>
+</head>
+<body class="lobby">
+  <h1>N&K Pong Game</h1>
+  
+  <div style="display:flex; justify-content:center; gap:20px; margin-bottom:15px;">
+    <button style="padding:12px 25px; font-size:18px; border:none; border-radius:8px; cursor:pointer; background:#bb0000; color:white; text-transform:uppercase; font-family:'Orbitron', sans-serif; transition:0.2s;"
+      onclick="window.location.href='index.html'">Vs AI</button>
+    <button style="padding:12px 25px; font-size:18px; border:none; border-radius:8px; cursor:pointer; background:#bb0000; color:white; text-transform:uppercase; font-family:'Orbitron', sans-serif; transition:0.2s;"
+      onclick="window.location.href='index.html'">Create Room</button>
+  </div>
+
+  <input type="text" id="roomCode" placeholder="Enter room code..." />
+
+  <div id="errorMsg"></div>
+
+  <button style="padding:12px 25px; font-size:18px; border:none; border-radius:8px; cursor:pointer; background:#bb0000; color:white; text-transform:uppercase; font-family:'Orbitron', sans-serif; transition:0.2s; margin-top:5px;"
+    onclick="goToRoom()">Find Room</button>
+
+  <script>
+    document.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('mouseenter', () => btn.style.background = '#ff0000');
+      btn.addEventListener('mouseleave', () => btn.style.background = '#bb0000');
+    });
+
+    function goToRoom() {
+      const input = document.getElementById('roomCode');
+      const code = input.value.trim();
+      const errorMsg = document.getElementById('errorMsg');
+      errorMsg.textContent = '';
+      if (!code) {
+        errorMsg.textContent = 'Please enter a room code!';
+        return;
+      }
+      localStorage.setItem('roomCode', code);
+      window.location.href = 'index.html';
+    }
+  </script>
+</body>
+</html>
