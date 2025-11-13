@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Pong Game</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="lobby" class="view active">
+    <h1>N&K Pong Game</h1>
+    <p id="welcomeMsg"></p>
+    
+    <div style="display:flex; justify-content:center; gap:20px; margin-bottom:20px;">
+      <button id="playAIBtn">AI Mode</button>
+      <button id="createRoomBtn">Create Room</button>
+    </div>
+
+    <p id="roomIdMsg"></p> 
+    
+    <input type="text" id="roomCode" placeholder="Enter room id..." />
+    <div id="lobbyErrorMsg"></div>
+    <button id="findRoomBtn">Find Room</button>
+    <br>
+    <button id="exitRoomBtn">Exit</button>
+  </div>
+
+  <div id="game" class="view">
+    <h1>N&K Pong Game</h1>
+    <button id="lobbyBtn" class="top-back-btn">← Back</button>
+    <p id="gameRoomIdMsg" style="font-size: 1.2em; color: #00ffff; margin-top: -20px; margin-bottom: 10px;"></p>
+    <canvas id="gameCanvas" width="640" height="400"></canvas>
+    
+    <div id="gameOverMenu" style="display: none; margin-top: 20px;">
+        <button id="rematchBtn">Rematch</button>
+    </div>
+
+    <p id="status">Connecting...</p>
+  </div>
+
+  <script src="./main.js"></script>
+  
+  <script>
+    const playerName = localStorage.getItem("playerName");
+    if (!playerName) {
+      window.location.href = "login.html";
+    }
+  </script>
+</body>
+</html>

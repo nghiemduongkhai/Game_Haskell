@@ -1,0 +1,173 @@
+/* ========= Login Page Styles ========= */
+body.login {
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  flex-direction: column;
+  font-family: 'Orbitron', sans-serif;
+}
+
+body.login h1 {
+  font-size: 55px;
+  background: linear-gradient(90deg, #ff0000, #000000);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-top: 20px;
+  margin-bottom: 55px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+body.login input {
+  padding: 10px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 18px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+  margin-bottom: 20px;
+}
+
+body.login button {
+  margin-top: 10px;
+  padding: 10px 20px;
+  background: #bb0000;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 18px;
+  cursor: pointer;
+  color: #ffffff;
+}
+
+body.login button:hover {
+  background: #ff0000;
+}
+
+/* ========= [1] Global Styles ========= */
+body {
+  background: #111;
+  margin-top: 10px;
+  padding: 0;
+  font-family: 'Orbitron', sans-serif;
+  color: #ffffff;
+  text-align: center;
+}
+
+/* ========= [2] View Wrapper ========= */
+.view {
+  display: none;
+}
+
+.view.active {
+  display: block;
+}
+
+/* ========= [3] Headers ========= */
+h1 {
+  font-size: 40px;
+  background: linear-gradient(90deg, #ff0000, #000000);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 30px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+/* ========= [4] Inputs & Buttons ========= */
+input[type="text"] {
+  padding: 10px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 18px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+  margin-bottom: 20px;
+}
+
+button {
+  margin-top: 10px;
+  padding: 10px 20px;
+  background: #bb0000;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 18px;
+  cursor: pointer;
+  color: #ffffff;
+  transition: 0.2s;
+}
+
+button:hover {
+  background: #ff0000;
+}
+
+.top-back-btn {
+  position: absolute;
+  top: 15px;     
+  left: 20px;   
+  border: none;
+  border-radius: 8px;
+  padding: 8px 15px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 16px;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.top-back-btn:hover {
+  background: #ff0000;
+  transform: scale(1.05);
+}
+
+/* ========= [5] Messages ========= */
+#welcomeMsg {
+  margin-top: 80px; 
+  margin-bottom: 15px;
+  text-align: center;
+  font-size: 1.5em; 
+  color: #00ffff;       
+}
+
+#playerIdMsg {
+  margin: 0; 
+  text-align: center;
+  font-size: 1.4em; 
+  color: #ffffff;       
+}
+
+#roomIdMsg {
+  margin-top: 40px; 
+  text-align: center;
+  font-size: 1.2em; 
+  color: #ffffff;       
+}
+
+#lobbyErrorMsg {
+  color: rgb(255, 225, 0);
+  margin-top: 5px;
+  font-size: 0.9em;
+  min-height: 1.1em;
+  text-align: center;
+}
+
+/* ========= [6] Room List ========= */
+#roomList {
+  margin-top: 10px;
+  text-align: center;
+  list-style: none;
+  padding: 0;
+}
+
+/* ========= [7] Game Canvas ========= */
+#gameCanvas {
+  background: black;
+  border: 2px solid #ffffff;
+  border-width: 10px 0.5px;
+  margin-top: 20px;
+}
