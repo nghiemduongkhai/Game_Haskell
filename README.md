@@ -24,10 +24,10 @@ PONG Game
 │   │   └── style.css
 │   ├── package.yaml   
 │   └── stack.yaml
-├── .env
 ├── cabal.project
 └── README.md
 ```
+
 
 
 
