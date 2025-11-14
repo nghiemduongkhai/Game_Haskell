@@ -127,13 +127,11 @@ ws.onmessage = (event) => {
 
 // -- Lobby Buttons --
 playAIBtn.onclick = () => {
-  const aiPlayerName = "AI bot";
-  localStorage.setItem("playerName", aiPlayerName);
-
+  gameRoomIdMsg.style.display = "none";
   // Tạo phòng AI
   ws.send(JSON.stringify({
     action: "createRoom",
-    playerName: aiPlayerName,
+    playerName: ourPlayerName,
     aiMode: true 
   }));
 };
@@ -152,7 +150,6 @@ findRoomBtn.onclick = () => {
     lobbyErrorMsg.textContent = "Please enter a room ID!";
     return;
   }
-  
   ws.send(JSON.stringify({
     action: "joinRoom",
     roomId: code,

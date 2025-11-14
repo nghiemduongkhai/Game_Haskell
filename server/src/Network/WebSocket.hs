@@ -63,29 +63,41 @@ resetRoom room = room
   , p2_wantsRematch = False
   }
 
-handleMessage :: WS.Connection -> TVar WorldState -> ClientMessage -> Maybe ClientState
-              -> IO (Maybe ClientState)
+handleMessage :: WS.Connection -> TVar WorldState -> ClientMessage -> Maybe ClientState -> IO (Maybe ClientState)
 handleMessage conn worldState msg mClientState =
     case msg of
-      ClientCreateRoom playerName -> do
-        logLogin $ "Client creating room: " ++ T.unpack playerName
-        
+      ClientCreateRoom playerName aiFlag -> do
         newRoomId <- generateRoomID
-        let newClient = Client conn playerName Player1
-        let newRoom = Room
-              { roomId = newRoomId
-              , player1 = Just newClient
-              , player2 = Nothing
-              , gameState = initialState
-              , roomStatus = Waiting
-              , p1_wantsRematch = False
-              , p2_wantsRematch = False
-              }
+        let newClient = Client (Human conn) playerName Player1
+        let aiClient = Client AI "AIbot" Player2 
+        let (room, response) = case aiFlag of
+              Just True ->
+                ( Room
+                    { roomId = newRoomId
+                    , player1 = Just newClient
+                    , player2 = Just aiClient
+                    , gameState = initialState
+                    , roomStatus = Playing
+                    , p1_wantsRematch = False
+                    , p2_wantsRematch = True
+                    }
+                , ServerJoinedRoom { s_p1_name = playerName, s_p2_name = "AI Bot" }
+                )
+              _ ->
+                ( Room
+                    { roomId = newRoomId
+                    , player1 = Just newClient
+                    , player2 = Nothing
+                    , gameState = initialState
+                    , roomStatus = Waiting
+                    , p1_wantsRematch = False
+                    , p2_wantsRematch = False
+                    }
+                , ServerRoomCreated newRoomId
+                )
         
-        atomically $ modifyTVar' worldState (Map.insert newRoomId newRoom)
-        
-        WS.sendTextData conn $ encode $ ServerRoomCreated newRoomId
-        
+        atomically $ modifyTVar' worldState (Map.insert newRoomId room)
+        WS.sendTextData conn $ encode response
         pure $ Just (ClientState newRoomId Player1)
 
       ClientJoinRoom rId playerName -> do
@@ -98,7 +110,7 @@ handleMessage conn worldState msg mClientState =
             Just room ->
               if isNothing (player1 room) then do
                 -- Ghế P1 trống, gán vào P1
-                let newClient = Client conn playerName Player1
+                let newClient = Client (Human conn) playerName Player1
                 let updatedRoom = room { player1 = Just newClient }
                 
                 -- Kiểm tra xem P2 có ở đó không, nếu có -> bắt đầu game
@@ -113,7 +125,7 @@ handleMessage conn worldState msg mClientState =
 
               else if isNothing (player2 room) then do
                 -- Ghế P1 bận, ghế P2 trống, gán vào P2
-                let newClient = Client conn playerName Player2
+                let newClient = Client (Human conn) playerName Player2
                 let updatedRoom = room { player2 = Just newClient, roomStatus = Countdown }
                 modifyTVar' worldState (Map.insert rId updatedRoom)
                 pure (Right (Player2, player1 updatedRoom)) -- Vào thành công, báo cho P1
@@ -132,7 +144,9 @@ handleMessage conn worldState msg mClientState =
               Nothing -> WS.sendTextData conn $ encode $ ServerJoinedRoom playerName "Waiting..."
               Just p2 -> do
                 WS.sendTextData conn $ encode $ ServerJoinedRoom playerName (clientName p2)
-                WS.sendTextData (clientConn p2) $ encode $ ServerPlayerJoined playerName
+                case clientConn p2 of
+                  Human conn2 -> WS.sendTextData conn2 $ encode $ ServerPlayerJoined playerName
+                  AI         -> pure ()
             pure $ Just (ClientState rId Player1)
 
           Right (Player2, mP1) -> do -- Người mới là P2
@@ -140,7 +154,9 @@ handleMessage conn worldState msg mClientState =
               Nothing -> WS.sendTextData conn $ encode $ ServerJoinedRoom "Waiting..." playerName
               Just p1 -> do
                 WS.sendTextData conn $ encode $ ServerJoinedRoom (clientName p1) playerName
-                WS.sendTextData (clientConn p1) $ encode $ ServerPlayerJoined playerName
+                case clientConn p1 of
+                  Human conn1 -> WS.sendTextData conn1 $ encode $ ServerPlayerJoined playerName
+                  AI         -> pure ()
             pure $ Just (ClientState rId Player2)
 
       ClientInputMove clientInput ->
@@ -161,7 +177,7 @@ handleMessage conn worldState msg mClientState =
             disconnect conn worldState mClientState
             pure Nothing
 
-      ClientRematch ->
+      ClientRematch -> do
         case mClientState of
           Nothing -> pure mClientState -- Bỏ qua nếu client không ở trong phòng
           Just (ClientState rId player) -> do
@@ -174,7 +190,11 @@ handleMessage conn worldState msg mClientState =
                 Just room -> do
                   -- 1. Đánh dấu người chơi muốn rematch
                   let room_Marked = if player == Player1
-                                    then room { p1_wantsRematch = True }
+                                    then room { p1_wantsRematch = True , 
+                                                p2_wantsRematch = case player2 room of
+                                                  Just (Client AI _ _) -> True
+                                                  _ -> p2_wantsRematch room
+                                        }
                                     else room { p2_wantsRematch = True }
                   
                   -- 2. Kiểm tra xem cả hai đã sẵn sàng chưa
@@ -186,51 +206,50 @@ handleMessage conn worldState msg mClientState =
                     else do
                       -- 3. Nếu chưa đủ -> Chỉ lưu lại trạng thái đã đánh dấu
                       modifyTVar' worldState (Map.insert rId room_Marked)
-            
             pure mClientState
 
 disconnect :: WS.Connection -> TVar WorldState -> Maybe ClientState -> IO ()
 disconnect _conn _worldState Nothing =
   logInfo "Lobby client disconnected"
 
--- SỬA LỖI 1: Đổi tên 'roomId' thành 'rId' để tránh trùng lặp
 disconnect _conn worldState (Just (ClientState rId player)) = do
   logInfo $ "Player disconnected: " ++ show player ++ " from room " ++ T.unpack rId
   
-  -- SỬA LỖI 2: Di chuyển log ra ngoài 'atomically'
-  -- 'atomically' sẽ trả về (Bool: phòng có bị xóa không?, Maybe Client: ai là người còn lại?)
   (wasDeleted, mOpponent) <- atomically $ do
     world <- readTVar worldState
-    case Map.lookup rId world of -- Dùng 'rId'
-      Nothing -> pure (False, Nothing) -- Phòng đã bị xóa
+    case Map.lookup rId world of 
+      Nothing -> pure (False, Nothing) -- Phòng không tồn tại
       Just room -> do
-        -- 1. Cập nhật phòng: Gỡ người chơi hiện tại ra
+        -- Cập nhật phòng: Gỡ người chơi hiện tại ra
         let updatedRoom = if player == Player1
                           then room { player1 = Nothing }
                           else room { player2 = Nothing }
         
-        -- 2. Kiểm tra xem phòng có trống không
+        -- Kiểm tra xem phòng có trống không
         if isNothing (player1 updatedRoom) && isNothing (player2 updatedRoom)
           then do
-            -- 3a. Xóa phòng nếu cả 2 người rời đi
+            -- Xóa phòng nếu cả 2 người rời đi
             modifyTVar' worldState (Map.delete rId)
             pure (True, Nothing) -- Phòng đã bị xóa, không còn ai
           else do
-            -- 3b. Vẫn còn 1 người. Reset phòng về 'Waiting'
+            -- Vẫn còn 1 người. Reset phòng về 'Waiting'
             let room_Reset = resetRoom updatedRoom
             modifyTVar' worldState (Map.insert rId room_Reset)
             -- Trả về người chơi còn lại
             let opponent = if player == Player1 then player2 updatedRoom else player1 updatedRoom
             pure (False, opponent) -- Phòng được reset, trả về người còn lại
 
-  -- 3. Log (ở bên ngoài IO) dựa trên kết quả
+  -- Log (ở bên ngoài IO) dựa trên kết quả
   if wasDeleted
     then logInfo $ "Room empty, deleting: " ++ T.unpack rId
     else logInfo $ "Player left, resetting room: " ++ T.unpack rId
     
-  -- 4. Thông báo cho người chơi còn lại (Opponent)
+  -- Thông báo cho người chơi còn lại (Opponent)
   case mOpponent of
-    Just opponent -> WS.sendTextData (clientConn opponent) (encode $ ServerError "Opponent left, room reset.")
+    Just opponent -> 
+      case clientConn opponent of
+        Human connOpp -> WS.sendTextData connOpp $ encode $ ServerError "Opponent left, room reset."
+        AI         -> pure ()
     Nothing -> pure ()
 
 generateRoomID :: IO RoomID

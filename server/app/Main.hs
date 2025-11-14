@@ -24,7 +24,7 @@ main = do
     config <- loadConfig
 
     reloadFlag <- newMVar False
-    -- THAY ĐỔI 1: Khởi tạo WorldState (Map rỗng)
+    -- Khởi tạo WorldState (Map rỗng)
     worldState  <- newTVarIO Map.empty
 
     -- Chạy HTTP server
@@ -52,12 +52,12 @@ gameLoop worldState = forever $ do
     randoms <- replicateM (length playingRooms) (randomRIO (-1.0, 1.0))
     let roomsAndRandoms = zip playingRooms randoms
 
-    -- Cập nhật tất cả các phòng (trong 1 giao dịch STM)
+    -- Cập nhật tất cả các phòng (trong 1 STM)
     atomically $ do
         forM_ roomsAndRandoms $ \(room, randomY) -> do
             -- Xác định xem player2 có phải AI không
             let isAIPlayer = case player2 room of
-                               Nothing -> True
+                               Just (Client AI _ _) -> True
                                _       -> False
             -- Cập nhật game state
             let updatedGameState = updateGame deltaTime randomY isAIPlayer (gameState room)
@@ -105,12 +105,18 @@ broadcastUpdates rooms = forM_ rooms $ \room -> do
     
     -- Gửi cho P1 (nếu tồn tại)
     case player1 room of
-        Just p1 -> sendSafely (clientConn p1) msg
+        Just p1 -> 
+            case clientConn p1 of
+                Human conn -> sendSafely conn msg
+                AI         -> pure ()
         Nothing -> pure ()
         
     -- Gửi cho P2 (nếu tồn tại)
     case player2 room of
-        Just p2 -> sendSafely (clientConn p2) msg
+        Just p2 -> 
+            case clientConn p2 of
+                Human conn -> sendSafely conn msg
+                AI         -> pure ()
         Nothing -> pure ()
 
 -- | Gửi message một cách an toàn (bắt exception nếu client ngắt kết nối)

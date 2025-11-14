@@ -105,8 +105,9 @@ instance FromJSON GameState
 
 type RoomID = Text
 
+data ClientType = Human WS.Connection | AI
 data Client = Client
-  { clientConn   :: WS.Connection
+  { clientConn   :: ClientType
   , clientName   :: Text
   , clientPlayer :: Player
   }
@@ -117,9 +118,9 @@ data RoomStatus
   | Countdown
   | Playing
   | GameOver Text
-  deriving (Show, Eq, Generic) -- SỬA LẠI: XÓA ToJSON
+  deriving (Show, Eq, Generic) 
 
-instance ToJSON RoomStatus   -- THÊM DÒNG NÀY
+instance ToJSON RoomStatus 
 
 data Room = Room
   { roomId     :: RoomID
@@ -139,11 +140,11 @@ type WorldState = Map RoomID Room
 
 
 data ClientMessage
-  = ClientCreateRoom { c_playerName :: Text }
+  = ClientCreateRoom { c_playerName :: Text, c_aiMode :: Maybe Bool }
   | ClientJoinRoom   { c_roomId :: RoomID, c_playerName :: Text }
   | ClientInputMove  { c_input :: ClientInput }
   | ClientLeaveRoom
-  | ClientRematch
+  | ClientRematch 
   deriving (Show, Generic)
 
 data ServerMessage
@@ -178,7 +179,7 @@ instance FromJSON ClientMessage where
   parseJSON = withObject "ClientMessage" $ \v -> do
     action <- v .: "action" :: Parser Text
     case action of
-      "createRoom" -> ClientCreateRoom <$> v .: "playerName"
+      "createRoom" -> ClientCreateRoom <$> v .: "playerName" <*> v .: "aiMode"
       "joinRoom"   -> ClientJoinRoom <$> v .: "roomId" <*> v .: "playerName"
       "input"      -> ClientInputMove <$> v .: "data"
       "LeaveRoom"  -> pure ClientLeaveRoom
