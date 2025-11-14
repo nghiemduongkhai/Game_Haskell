@@ -8,6 +8,7 @@ PONG Game
 │   │   └── Main.hs
 │   ├── src/
 │   │   ├── Game/
+│   │   │   ├── AI.hs
 │   │   │   ├── Types.hs
 │   │   │   ├── Logic.hs
 │   │   │   └── State.hs
@@ -27,6 +28,7 @@ PONG Game
 ├── cabal.project
 └── README.md
 ```
+
 
 
 
