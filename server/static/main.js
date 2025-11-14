@@ -34,6 +34,8 @@ let countdown = 3;
 let countdownTimer = null;
 let ourPlayerName = localStorage.getItem("playerName");
 
+let hasClickedRematch = false;
+
 if (ourPlayerName) {
   welcomeMsg.textContent = `Welcome to Pong Game, ${ourPlayerName}!`;
 }
@@ -105,16 +107,26 @@ ws.onmessage = (event) => {
       gameState = msg.s_gameState;
       const newStatus = msg.s_roomStatus;
       
-      if (newStatus.tag === "Countdown" && (!roomStatus || roomStatus.tag !== "Countdown")) {
-        gameOverMenu.style.display = "none"; // Ẩn các btn    
-        startCountdown();
+      if (newStatus.tag === "Countdown") {
+        hasClickedRematch = false;
+        gameOverMenu.style.display = "none"; // Ẩn các btn 
+        if (!roomStatus || roomStatus.tag !== "Countdown") startCountdown();
       }
-
+      
+      if (newStatus.tag === "Playing") {
+        hasClickedRematch = false;
+        rematchBtn.disabled = false;
+        rematchBtn.textContent = "Rematch";
+        gameOverMenu.style.display = "none";
+      }
+      
       if (newStatus.tag === "GameOver") {
         gameOverMenu.style.display = "block"; // Hiện các btn
         rematchBtn.style.display = 'inline-block';
-        rematchBtn.disabled = false;         
-        rematchBtn.textContent = "Rematch";
+        if (!hasClickedRematch) {
+          rematchBtn.disabled = false;         
+          rematchBtn.textContent = "Rematch";
+        }
       }
 
       roomStatus = newStatus;
@@ -181,6 +193,7 @@ exitRoomBtn.onclick = () => {
 };
 
 rematchBtn.onclick = () => {
+  hasClickedRematch = true;
   ws.send(JSON.stringify({
     action: "Rematch"
   }));
