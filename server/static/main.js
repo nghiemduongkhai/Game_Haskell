@@ -95,6 +95,7 @@ ws.onmessage = (event) => {
     case "ServerError":
       if (gameView.classList.contains("active")) {
           roomStatus = { tag: "Waiting" };
+          gameOverMenu.style.display = "none";
       } else {
           lobbyErrorMsg.textContent = msg.s_errorMsg;
       }
@@ -105,13 +106,13 @@ ws.onmessage = (event) => {
       const newStatus = msg.s_roomStatus;
       
       if (newStatus.tag === "Countdown" && (!roomStatus || roomStatus.tag !== "Countdown")) {
-        gameOverMenu.style.display = "none";       
+        gameOverMenu.style.display = "none"; // Ẩn các btn    
         startCountdown();
       }
-      
-      if (newStatus.tag === "GameOver") {
-        gameOverMenu.style.display = "block"; // Hiện các nút bấm
 
+      if (newStatus.tag === "GameOver") {
+        gameOverMenu.style.display = "block"; // Hiện các btn
+        rematchBtn.style.display = 'inline-block';
         rematchBtn.disabled = false;         
         rematchBtn.textContent = "Rematch";
       }
@@ -137,9 +138,11 @@ playAIBtn.onclick = () => {
 };
 
 createRoomBtn.onclick = () => {
+  gameRoomIdMsg.style.display = "block";
   ws.send(JSON.stringify({
     action: "createRoom",
-    playerName: ourPlayerName
+    playerName: ourPlayerName,
+    aiMode: false
   }));
 };
 
@@ -181,11 +184,9 @@ rematchBtn.onclick = () => {
   ws.send(JSON.stringify({
     action: "Rematch"
   }));
-  
   rematchBtn.disabled = true;
-  rematchBtn.textContent = "Waiting for opponent...";
+  rematchBtn.textContent = "Loading...";
 };
-
 
 // -- Game Input --
 document.addEventListener("keydown", e => {
